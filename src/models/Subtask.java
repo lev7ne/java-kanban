@@ -1,23 +1,24 @@
+package models;
+
 import java.util.Objects;
 
 public class Subtask extends Task {
 
-    Integer epicID;
+    public Integer epicID;
 
     public Integer getEpicID() {
         return epicID;
     }
 
-    public Subtask(String title, String description, String status, Epic epic) {
+    public Subtask(String title, String description, String status) {
         super(title, description, status);
-        this.epicID = epic.id;
     }
 
     @Override
     public String toString() {
-        return "Subtask{" +
+        return "models.Subtask{" +
                 "epicID=" + epicID +
-                ", id=" + id +
+                ", id=" + getId() +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", status='" + status + '\'' +
