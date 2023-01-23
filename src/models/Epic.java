@@ -5,43 +5,27 @@ import java.util.List;
 
 
 public class Epic extends Task {
-    private List<Subtask> subtasks = new ArrayList<>();
+    private List<Integer> subtaskIdList = new ArrayList<>();
 
-    public void setSubtasks(List<Subtask> subtasks) {
-        this.subtasks = subtasks;
+    public Epic (String title, String description, String status, List<Integer> subtaskIdList) {
+        super(title, description, status);
     }
 
-    public List<Subtask> getSubtasks() {
-        return subtasks;
+    public List<Integer> getSubtaskIdList() {
+        return subtaskIdList;
     }
 
-    public void addNewSubtask(Subtask subtask) {
-        subtasks.add(subtask);
-        updateEpicStatus();
-    }
-
-    public void updateEpicStatus() {
-        for (Subtask element : subtasks) {
-            if (!element.status.equals("DONE")) {
-                this.status = "IN_PROGRESS";
-            }
-        }
-    }
-
-    public Epic(String title, String description) {
-        super(title, description);
-        this.status = "NEW";
+    public void setSubtaskIdList(List<Integer> subtaskIdList) {
+        this.subtaskIdList = subtaskIdList;
     }
 
     @Override
     public String toString() {
-        return "models.Epic{" +
-                "subtasks=" + subtasks +
-                ", id=" + getId() +
-                ", title='" + description + '\'' +
+        return "Epic{" +
+                "title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", status='" + status + '\'' +
+                ", subtaskIdList=" + subtaskIdList +
                 '}';
     }
-
 }
