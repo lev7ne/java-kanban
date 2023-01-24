@@ -19,18 +19,16 @@ public class Main {
 
         manager.createTask(task1);
         manager.createTask(task2);
-        System.out.println(manager.taskMap);
-
+        
         // создание объектов Epic и Subtask и добавление их в соответствующие MapEpic, MapSubtask
         Epic epic1 = new Epic("epic1", "epic_description1", manager.getNEW(), null);
         manager.createEpic(epic1);
 
-        Subtask subtask1 = new Subtask("subtask1", "subtask_description1", manager.getNEW(), epic1.getId());
-        Subtask subtask2 = new Subtask("subtask2", "subtask_description2", manager.getNEW(), epic1.getId());
+        Subtask subtask1 = new Subtask("subtask1", "subtask_description1", manager.getDONE(), epic1.getId());
+        Subtask subtask2 = new Subtask("subtask2", "subtask_description2", manager.getDONE(), epic1.getId());
         manager.createSubtask(subtask1);
         manager.createSubtask(subtask2);
 
-        System.out.println(manager.epicMap);
 
         Epic epic2 = new Epic("epic2", "description2", manager.getNEW(), null);
         manager.createEpic(epic2);
@@ -38,9 +36,6 @@ public class Main {
         Subtask subtask3 = new Subtask("subtask3", "subtask_description3", manager.getIN_PROGRESS(), epic2.getId());
         manager.createSubtask(subtask3);
 
-        System.out.println(manager.epicMap);
-
-        System.out.println(manager.subtaskMap);
 
     }
 }
