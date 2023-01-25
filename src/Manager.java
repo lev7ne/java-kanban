@@ -108,9 +108,8 @@ public class Manager {
         if (someTask == null) {
             return;
         }
-        if (taskMap.containsKey(task.getId())) {
-            taskMap.put(task.getId(), task);
-        }
+        taskMap.put(task.getId(), task);
+
     }
 
     void updateEpic(Epic epic) {
@@ -123,7 +122,7 @@ public class Manager {
     }
 
     void updateSubtask(Subtask subtask) {
-        Subtask someSubtask = subtaskMap.get(subtask.getEpicId());
+        Subtask someSubtask = subtaskMap.get(subtask.getId());
         if (someSubtask == null) {
             return;
         }
