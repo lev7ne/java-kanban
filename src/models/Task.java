@@ -12,7 +12,13 @@ public class Task {
         this.status = status;
     }
 
-    public Task(Integer id, String title, String description, String status) {
+    public Task(Integer id, String title, String description) { // конструктор для проверки updateEpic
+        this.id = id;
+        this.title = title;
+        this.description = description;
+    }
+
+    public Task(Integer id, String title, String description, String status) { //
         this.id = id;
         this.title = title;
         this.description = description;
