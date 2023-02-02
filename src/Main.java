@@ -1,38 +1,53 @@
-import models.Epic;
-import models.Subtask;
-import models.Task;
+import manager.HistoryManager;
+import manager.Managers;
+import manager.TaskManager;
+import models.*;
+
+import static models.Status.*;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("Поехали!");
 
-        Manager manager = new Manager();
+        TaskManager taskManager = Managers.getDefault();
+        HistoryManager historyManager = Managers.getDefaultHistory();
 
-        // создание объектов Task и добавление в MapTasks
-        Task task1 = new Task("task1", "task_description1", Manager.NEW);
-        Task task2 = new Task("task2", "task_description2", Manager.IN_PROGRESS);
-        manager.createTask(task1);
-        manager.createTask(task2);
-        
-        // создание объектов Epic и Subtask и добавление их в соответствующие MapEpic, MapSubtask
-        Epic epic1 = new Epic("epic1", "epic_description1", Manager.NEW);
-        manager.createEpic(epic1);
+        Task task1 = new Task("task1", "task_description1", NEW);
+        Task task2 = new Task("task2", "task_description2", IN_PROGRESS);
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
 
-        Subtask subtask1 = new Subtask("subtask1", "subtask_description1", Manager.DONE, epic1.getId());
-        Subtask subtask2 = new Subtask("subtask2", "subtask_description2", Manager.IN_PROGRESS, epic1.getId());
-        manager.createSubtask(subtask1);
-        manager.createSubtask(subtask2);
+        Epic epic1 = new Epic("epic1", "epic_description1", NEW);
+        taskManager.createEpic(epic1);
 
-        Epic epic2 = new Epic("epic2", "description2", Manager.NEW);
-        manager.createEpic(epic2);
+        Subtask subtask1 = new Subtask("subtask1", "subtask_description1", DONE, epic1.getId());
+        Subtask subtask2 = new Subtask("subtask2", "subtask_description2", IN_PROGRESS, epic1.getId());
+        taskManager.createSubtask(subtask1);
+        taskManager.createSubtask(subtask2);
 
-        Subtask subtask3 = new Subtask("subtask3", "subtask_description3", Manager.IN_PROGRESS, epic2.getId());
-        manager.createSubtask(subtask3);
+        Epic epic2 = new Epic("epic2", "description2", NEW);
+        taskManager.createEpic(epic2);
 
-        // вывод всех мап
-        System.out.println(manager.taskMap);
-        System.out.println(manager.epicMap);
-        System.out.println(manager.subtaskMap);
+        Subtask subtask3 = new Subtask("subtask3", "subtask_description3", IN_PROGRESS, epic2.getId());
+        taskManager.createSubtask(subtask3);
+
+        System.out.println(taskManager.getTasks());
+        System.out.println(taskManager.getEpics());
+        System.out.println(taskManager.getSubtasks());
+
+        System.out.println("------------");
+        taskManager.getTask(2);
+        taskManager.getTask(2);
+        taskManager.getTask(1);
+        taskManager.getTask(1);
+        taskManager.getTask(1);
+        taskManager.getTask(1);
+        taskManager.getTask(1);
+        taskManager.getTask(1);
+        taskManager.getTask(1);
+        taskManager.getTask(1);
+        taskManager.getTask(1);
+
+        System.out.println(historyManager.getHistory());
     }
-    
 }

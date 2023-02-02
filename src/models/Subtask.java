@@ -3,12 +3,12 @@ package models;
 public class Subtask extends Task {
     private Integer epicId;
 
-    public Subtask(String title, String description, String status, Integer epicId) {
+    public Subtask(String title, String description, Status status, Integer epicId) {
         super(title, description, status);
         this.epicId = epicId;
     }
 
-    public Subtask(Integer id, String title, String description, String status, Integer epicId) {
+    public Subtask(Integer id, String title, String description, Status status, Integer epicId) {
         super(id, title, description, status);
         this.epicId = epicId;
     }
@@ -31,5 +31,4 @@ public class Subtask extends Task {
                 ", epicId=" + epicId +
                 '}';
     }
-
 }
