@@ -1,6 +1,4 @@
-import manager.HistoryManager;
-import manager.Managers;
-import manager.TaskManager;
+import manager.*;
 import models.*;
 
 import static models.Status.*;
@@ -10,7 +8,7 @@ public class Main {
         System.out.println("Поехали!");
 
         TaskManager taskManager = Managers.getDefault();
-        HistoryManager historyManager = Managers.getDefaultHistory();
+
 
         Task task1 = new Task("task1", "task_description1", NEW);
         Task task2 = new Task("task2", "task_description2", IN_PROGRESS);
@@ -31,11 +29,6 @@ public class Main {
         Subtask subtask3 = new Subtask("subtask3", "subtask_description3", IN_PROGRESS, epic2.getId());
         taskManager.createSubtask(subtask3);
 
-        System.out.println(taskManager.getTasks());
-        System.out.println(taskManager.getEpics());
-        System.out.println(taskManager.getSubtasks());
-
-        System.out.println("------------");
         taskManager.getTask(2);
         taskManager.getTask(2);
         taskManager.getTask(1);
@@ -48,6 +41,6 @@ public class Main {
         taskManager.getTask(1);
         taskManager.getTask(1);
 
-        System.out.println(historyManager.getHistory());
+        System.out.println(taskManager.getHistory());
     }
 }

@@ -5,9 +5,9 @@ import models.Subtask;
 import models.Task;
 
 import java.util.List;
+import java.util.Queue;
 
 public interface TaskManager {
-    void counterID(); // метод для увеличения счетчика, помогает присваивать всем models.Task уникальный идентификатор
 
     int createTask(Task task);
 
@@ -45,4 +45,6 @@ public interface TaskManager {
     void deleteEpics();
 
     void deleteSubtasks();
+
+    public List<Task> getHistory();
 }
