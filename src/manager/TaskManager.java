@@ -46,5 +46,5 @@ public interface TaskManager {
 
     void deleteSubtasks();
 
-    public List<Task> getHistory();
+    List<Task> getHistory();
 }
