@@ -9,9 +9,9 @@ public class Main {
 
         TaskManager taskManager = Managers.getDefault();
 
-
         Task task1 = new Task("task1", "task_description1", NEW);
         Task task2 = new Task("task2", "task_description2", IN_PROGRESS);
+
         taskManager.createTask(task1);
         taskManager.createTask(task2);
 
@@ -29,18 +29,15 @@ public class Main {
         Subtask subtask3 = new Subtask("subtask3", "subtask_description3", IN_PROGRESS, epic2.getId());
         taskManager.createSubtask(subtask3);
 
-        taskManager.getTask(2);
-        taskManager.getTask(2);
         taskManager.getTask(1);
         taskManager.getTask(1);
-        taskManager.getTask(1);
-        taskManager.getTask(1);
-        taskManager.getTask(1);
-        taskManager.getTask(1);
-        taskManager.getTask(1);
-        taskManager.getTask(1);
-        taskManager.getTask(1);
+        taskManager.getEpic(3);
+        taskManager.getSubtask(4);
+        taskManager.getSubtask(4);
+        taskManager.getEpic(3);
+        taskManager.getSubtask(4);
 
         System.out.println(taskManager.getHistory());
+
     }
 }

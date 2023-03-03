@@ -6,31 +6,62 @@ import models.Task;
 import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
+    CustomLinkedList history = new CustomLinkedList();
 
-    class CustomLinkedList { // linkLast и getTasks
+    class CustomLinkedList {
         Map<Integer, Node> historyHashMap = new HashMap<>();
         private Node first;
         private Node last;
         private int size = 0;
 
-        public void linkLast(Task task) { // добавить в конец
+        public void linkLast(Task task) {
             final Node l = last;
             final Node newNode = new Node(l, task, null);
-            historyHashMap.put(size++, newNode);
-            // (null, task, null) ->
+            historyHashMap.put(task.getId(), newNode);
+            last = newNode;
             if (l == null) {
-                last = newNode;
+                first = newNode;
             } else {
                 l.next = newNode;
             }
+            size++;
         }
 
-        public Task getTasks() {
-            return null;
+        public List<Task> getTasks() {
+            List<Task> historyArrayList = new ArrayList<>();
+            Node n = first;
+            while (n != null) {
+                historyArrayList.add(n.task);
+                n = n.next;
+            }
+            return historyArrayList;
+        }
+
+        private void removeNode(Node node) {
+            if (node.prev == null) {
+                Node next = node.next;
+                next.prev = null;
+                first = next;
+            } else if (node.next == null) {
+                Node prev = node.prev;
+                prev.next = null;
+                last = prev;
+            } else {
+                Node prev = node.prev;
+                Node next = node.next;
+                prev.next = next;
+                next.prev = prev;
+            }
+        }
+
+        public void remove(int id) {
+            if (historyHashMap.containsKey(id)) {
+                removeNode(historyHashMap.get(id));
+            } else {
+                removeNode(first);
+            }
         }
     }
-
-    LinkedList<Task> history = new LinkedList<>();
 
     @Override
     public void add(Task task) {
@@ -38,11 +69,11 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private void addInformationInHistoryLinkedList(Task task) {
-        if (history.size() < 10) {
-            history.add(task);
+        if (history.size < 3) {
+            history.linkLast(task);
         } else {
-            history.removeFirst();
-            history.add(task);
+            history.remove(task.getId());
+            history.linkLast(task);
         }
     }
 
@@ -53,7 +84,8 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        return history;
+        return history.getTasks();
     }
 }
+
 
