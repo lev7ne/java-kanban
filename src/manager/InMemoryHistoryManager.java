@@ -12,7 +12,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         Map<Integer, Node> historyHashMap = new HashMap<>();
         private Node first;
         private Node last;
-        private int size = 0;
+
 
         public void linkLast(Task task) {
             final Node l = last;
@@ -24,7 +24,6 @@ public class InMemoryHistoryManager implements HistoryManager {
             } else {
                 l.next = newNode;
             }
-            size++;
         }
 
         public List<Task> getTasks() {
@@ -37,29 +36,30 @@ public class InMemoryHistoryManager implements HistoryManager {
             return historyArrayList;
         }
 
-        private void removeNode(Node node) {
-            if (node.prev == null) {
+        private void removeNode(Node node) { // NPE выбивал в этом методе постоянно, помогла вот эта проверка history.historyHashMap.containsKey(task.getId())
+                                             // в методе addInformationInHistoryLinkedList(Task task)
+            
+            if (node.prev == null) { // если нода оказывается первой
                 Node next = node.next;
                 next.prev = null;
                 first = next;
-            } else if (node.next == null) {
+            } else if (node.next == null) { // если нода оказывается последней
                 Node prev = node.prev;
                 prev.next = null;
                 last = prev;
-            } else {
+            } else if (node.prev != null && node.next != null) { // если нода в середине
                 Node prev = node.prev;
                 Node next = node.next;
                 prev.next = next;
                 next.prev = prev;
+            } else if (node.prev == null && node.next == null) { // если нода единственная
+                first = null;
+                last = null;
             }
         }
 
         public void remove(int id) {
-            if (historyHashMap.containsKey(id)) {
-                removeNode(historyHashMap.get(id));
-            } else {
-                removeNode(first);
-            }
+            removeNode(historyHashMap.remove(id)); // постоянно забываю, что метод remove() возвращает значение, поэтому оставлю тут этот коммент
         }
     }
 
@@ -69,12 +69,10 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private void addInformationInHistoryLinkedList(Task task) {
-        if (history.size < 3) {
-            history.linkLast(task);
-        } else {
+        if (history.historyHashMap.containsKey(task.getId())) {
             history.remove(task.getId());
-            history.linkLast(task);
         }
+        history.linkLast(task);
     }
 
     @Override

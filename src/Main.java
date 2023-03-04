@@ -30,12 +30,13 @@ public class Main {
         taskManager.createSubtask(subtask3);
 
         taskManager.getTask(1);
+        taskManager.getTask(2);
+        taskManager.getEpic(3);
+        taskManager.getSubtask(4);
+        taskManager.getSubtask(4);
+        taskManager.getSubtask(4);
         taskManager.getTask(1);
         taskManager.getEpic(3);
-        taskManager.getSubtask(4);
-        taskManager.getSubtask(4);
-        taskManager.getEpic(3);
-        taskManager.getSubtask(4);
 
         System.out.println(taskManager.getHistory());
 
