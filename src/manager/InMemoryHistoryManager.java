@@ -37,13 +37,13 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
 
         private void removeNode(Node node) { // NPE выбивал в этом методе постоянно, помогла вот эта проверка history.historyHashMap.containsKey(task.getId())
-                                             // в методе addInformationInHistoryLinkedList(Task task)
-            
-            if (node.prev == null) { // если нода оказывается первой
+            // в методе addInformationInHistoryLinkedList(Task task)
+
+            if (node.prev == null && node.next != null) { // если нода оказывается первой
                 Node next = node.next;
                 next.prev = null;
                 first = next;
-            } else if (node.next == null) { // если нода оказывается последней
+            } else if (node.next == null && node.prev != null) { // если нода оказывается последней
                 Node prev = node.prev;
                 prev.next = null;
                 last = prev;
@@ -57,6 +57,7 @@ public class InMemoryHistoryManager implements HistoryManager {
                 last = null;
             }
         }
+
 
         public void remove(int id) {
             removeNode(historyHashMap.remove(id)); // постоянно забываю, что метод remove() возвращает значение, поэтому оставлю тут этот коммент

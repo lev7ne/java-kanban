@@ -156,6 +156,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         for (Integer subId : epic.getSubtaskIdList()) {
             subtaskMap.remove(subId);
+            hm.remove(subId);
         }
         hm.remove(id);
     }
@@ -173,17 +174,29 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteTasks() {
+        for (Map.Entry<Integer, Task> pair : taskMap.entrySet()) {
+            hm.remove(pair.getKey());
+        }
         taskMap.clear();
     }
 
     @Override
     public void deleteEpics() {
+        for (Map.Entry<Integer, Epic> pair : epicMap.entrySet()) {
+            for (Integer subtaskId : pair.getValue().getSubtaskIdList()) {
+                hm.remove(subtaskId);
+            }
+            hm.remove(pair.getKey());
+        }
         epicMap.clear();
         subtaskMap.clear();
     }
 
     @Override
     public void deleteSubtasks() {
+        for (Map.Entry<Integer, Subtask> pair : subtaskMap.entrySet()) {
+            hm.remove(pair.getKey());
+        }
         subtaskMap.clear();
         for (Map.Entry<Integer, Epic> pair : epicMap.entrySet()) {
             pair.getValue().setStatus(NEW);
