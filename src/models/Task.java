@@ -2,28 +2,23 @@ package models;
 
 public class Task {
     private Integer id;
-    protected String title;
+    protected String name;
     protected String description;
     protected Status status;
 
     public Task(String title, String description, Status status) {
-        this.title = title;
+        this.name = title;
         this.description = description;
         this.status = status;
     }
 
-    public Task(Integer id, String title, String description) { // конструктор для проверки updateEpic
+    public Task(Integer id, String title, Status status, String description) { //
         this.id = id;
-        this.title = title;
+        this.name = title;
+        this.status = status;
         this.description = description;
     }
 
-    public Task(Integer id, String title, String description, Status status) { //
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.status = status;
-    }
 
     public Integer getId() {
         return id;
@@ -33,12 +28,12 @@ public class Task {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Status getStatus() {
@@ -59,11 +54,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", status='" + status + '\'' +
-                '}';
+        return getId() + "," + TaskType.TASK + "," + name + "," + this.status + "," + description + " " + name.toLowerCase();
     }
+
 }

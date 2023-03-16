@@ -9,13 +9,13 @@ import static models.Status.*;
 public class InMemoryTaskManager implements TaskManager {
     private Integer id = 0;
 
-    private final Map<Integer, Task> taskMap = new HashMap<>();
-    private final Map<Integer, Epic> epicMap = new HashMap<>();
-    private final Map<Integer, Subtask> subtaskMap = new HashMap<>();
+    protected static final Map<Integer, Task> taskMap = new HashMap<>();
+    protected static final Map<Integer, Epic> epicMap = new HashMap<>();
+    protected static final Map<Integer, Subtask> subtaskMap = new HashMap<>();
 
-    HistoryManager hm = Managers.getDefaultHistory();
+    HistoryManager inMemoryHistoryManager = Managers.getDefaultInMemoryHistoryManager(); // inMemoryHistoryManager
 
-    public void counterID() {
+    private void counterID() {
         this.id++;
     }
 
@@ -87,19 +87,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTask(Integer id) {
-        hm.add(taskMap.get(id));
+        inMemoryHistoryManager.add(taskMap.get(id));
         return taskMap.get(id);
     }
 
     @Override
     public Task getEpic(Integer id) {
-        hm.add(epicMap.get(id));
+        inMemoryHistoryManager.add(epicMap.get(id));
         return epicMap.get(id);
     }
 
     @Override
     public Task getSubtask(Integer id) {
-        hm.add(subtaskMap.get(id));
+        inMemoryHistoryManager.add(subtaskMap.get(id));
         return subtaskMap.get(id);
     }
 
@@ -128,7 +128,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (someEpic == null) { // перед заменой, проверяем не в пустом ли эпике, пытаемся обновить инфо
             return;
         }
-        someEpic.setTitle(epic.getTitle());
+        someEpic.setName(epic.getName());
         someEpic.setDescription(epic.getDescription());
     }
 
@@ -145,7 +145,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTask(int id) {
         taskMap.remove(id);
-        hm.remove(id);
+        inMemoryHistoryManager.remove(id);
     }
 
     @Override
@@ -156,9 +156,9 @@ public class InMemoryTaskManager implements TaskManager {
         }
         for (Integer subId : epic.getSubtaskIdList()) {
             subtaskMap.remove(subId);
-            hm.remove(subId);
+            inMemoryHistoryManager.remove(subId);
         }
-        hm.remove(id);
+        inMemoryHistoryManager.remove(id);
     }
 
     @Override
@@ -169,13 +169,13 @@ public class InMemoryTaskManager implements TaskManager {
             pair.getValue().getSubtaskIdList().remove((Integer) id);
         }
         updateEpicStatus(epicId);
-        hm.remove(id);
+        inMemoryHistoryManager.remove(id);
     }
 
     @Override
     public void deleteTasks() {
         for (Map.Entry<Integer, Task> pair : taskMap.entrySet()) {
-            hm.remove(pair.getKey());
+            inMemoryHistoryManager.remove(pair.getKey());
         }
         taskMap.clear();
     }
@@ -184,9 +184,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteEpics() {
         for (Map.Entry<Integer, Epic> pair : epicMap.entrySet()) {
             for (Integer subtaskId : pair.getValue().getSubtaskIdList()) {
-                hm.remove(subtaskId);
+                inMemoryHistoryManager.remove(subtaskId);
             }
-            hm.remove(pair.getKey());
+            inMemoryHistoryManager.remove(pair.getKey());
         }
         epicMap.clear();
         subtaskMap.clear();
@@ -195,7 +195,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteSubtasks() {
         for (Map.Entry<Integer, Subtask> pair : subtaskMap.entrySet()) {
-            hm.remove(pair.getKey());
+            inMemoryHistoryManager.remove(pair.getKey());
         }
         subtaskMap.clear();
         for (Map.Entry<Integer, Epic> pair : epicMap.entrySet()) {
@@ -206,6 +206,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getHistory() {
-        return hm.getHistory();
+        return inMemoryHistoryManager.getHistory();
     }
+
 }

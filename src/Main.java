@@ -7,38 +7,30 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Поехали!");
 
-        TaskManager taskManager = Managers.getDefault();
+        TaskManager inMemoryTaskManager = new InMemoryTaskManager();
+        TaskManager fileBackedTasksManager = new FileBackedTasksManager();
 
-        Task task1 = new Task("task1", "task_description1", NEW);
-        Task task2 = new Task("task2", "task_description2", IN_PROGRESS);
 
-        taskManager.createTask(task1);
-        taskManager.createTask(task2);
 
-        Epic epic1 = new Epic("epic1", "epic_description1", NEW);
-        taskManager.createEpic(epic1);
+        Task task1 = new Task("название_таск", "описание_таск", NEW);
+        inMemoryTaskManager.createTask(task1);
 
-        Subtask subtask1 = new Subtask("subtask1", "subtask_description1", DONE, epic1.getId());
-        Subtask subtask2 = new Subtask("subtask2", "subtask_description2", IN_PROGRESS, epic1.getId());
-        taskManager.createSubtask(subtask1);
-        taskManager.createSubtask(subtask2);
+        Epic epic1 = new Epic("название_эпик", "описание_эпик", NEW);
+        inMemoryTaskManager.createEpic(epic1);
 
-        Epic epic2 = new Epic("epic2", "description2", NEW);
-        taskManager.createEpic(epic2);
+        Subtask subtask1 = new Subtask("название_сабтаск", "описание_сабтаск", DONE, epic1.getId());
+        inMemoryTaskManager.createSubtask(subtask1);
 
-        Subtask subtask3 = new Subtask("subtask3", "subtask_description3", IN_PROGRESS, epic2.getId());
-        taskManager.createSubtask(subtask3);
+        inMemoryTaskManager.getTask(1);
+        inMemoryTaskManager.getTask(1);
+        inMemoryTaskManager.getEpic(2);
+        inMemoryTaskManager.getSubtask(3);
+        inMemoryTaskManager.getEpic(2);
+        inMemoryTaskManager.getTask(1);
+        inMemoryTaskManager.getEpic(2);
 
-        taskManager.getTask(1);
-        taskManager.deleteTask(1);
-        taskManager.getTask(2);
-        taskManager.getEpic(3);
-        taskManager.getSubtask(4);
-        taskManager.getSubtask(4);
-        taskManager.getSubtask(4);
-        // taskManager.getTask(1); - получается если обратиться к Task, которая была ранее удалена в строке 33, происходит NPE,
-        // в данном ТЗ необходимо что-то с этим делать?
-        taskManager.getEpic(3);
-        System.out.println(taskManager.getHistory());
+
+        System.out.println(inMemoryTaskManager.getHistory());
+
     }
 }

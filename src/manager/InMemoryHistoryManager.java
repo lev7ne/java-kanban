@@ -9,6 +9,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     CustomLinkedList history = new CustomLinkedList();
 
     class CustomLinkedList {
+
         Map<Integer, Node> historyHashMap = new HashMap<>();
         private Node first;
         private Node last;
@@ -57,11 +58,10 @@ public class InMemoryHistoryManager implements HistoryManager {
                 last = null;
             }
         }
-
-
-        public void remove(int id) {
+        public void  remove(int id) {
             removeNode(historyHashMap.remove(id)); // постоянно забываю, что метод remove() возвращает значение, поэтому оставлю тут этот коммент
         }
+
     }
 
     @Override
@@ -85,6 +85,8 @@ public class InMemoryHistoryManager implements HistoryManager {
     public List<Task> getHistory() {
         return history.getTasks();
     }
+
+
 }
 
 
