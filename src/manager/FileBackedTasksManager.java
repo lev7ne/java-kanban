@@ -13,33 +13,29 @@ import java.util.List;
 import java.util.Map;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-    static String source = "C:\\Users\\528\\Desktop\\YandexPraktikum\\java-kanban\\src\\tasks.txt";
-    Path path;
-    static HistoryManager historyManager = Managers.getDefaultInMemoryHistoryManager();
-
-    /*
-    Кучу всего пришлось сделать статическим, есть подозрение, что получилась ерунда, но тест проходит :)
-     */
 
     public static void main(String[] args) {
-        loadFromFile();
-        System.out.println(taskMap);
-        System.out.println(epicMap);
-        System.out.println(subtaskMap);
-        System.out.println();
-        System.out.println(historyManager.getHistory());
+        FileBackedTasksManager fileBackedTasksManager = FileBackedTasksManager.loadFromFile("src/tasks.txt");
 
+        System.out.println(fileBackedTasksManager.taskMap);
+        System.out.println(fileBackedTasksManager.epicMap);
+
+
+        System.out.println(fileBackedTasksManager.subtaskMap);
+        System.out.println(fileBackedTasksManager.getHistory());
+        System.out.println(fileBackedTasksManager.getId());
     }
 
-    public void save() {
-        if (!Files.exists(Paths.get(source))) {
+    private void save() {
+        Path path = Paths.get("src/tasks.txt");
+        if (!Files.exists(path)) {
             try {
-                this.path = Files.createFile(Paths.get(source));
+                Files.createFile(path);
             } catch (IOException e) {
                 throw new ManagerSaveException("Ошибка");
             }
         }
-        try (Writer fileWriter = new FileWriter(source)) {
+        try (Writer fileWriter = new FileWriter("src/tasks.txt")) {
             fileWriter.append("id,type,name,status,description,epic" + "\n");
             for (Map.Entry<Integer, Task> pair : taskMap.entrySet()) {
                 fileWriter.write(pair.getValue().toString() + "\n");
@@ -52,6 +48,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             }
             fileWriter.write("\n");
             fileWriter.write(historyToString(inMemoryHistoryManager));
+
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка");
         }
@@ -65,35 +62,44 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return sb.toString();
     }
 
-    public static void loadFromFile() {
-        if (Files.exists(Paths.get(source))) {
+    public static FileBackedTasksManager loadFromFile(String source) {
+        Path path = Paths.get(source);
+        FileBackedTasksManager mgr = new FileBackedTasksManager();
+        if (Files.exists(path)) {
             try {
-                String data = Files.readString(Path.of(source));
+                String data = Files.readString(path);
                 String[] strings = data.split("\n");
                 for (int i = 1; i < strings.length; i++) {
                     if (strings[i].equals("")) {
-
                         List<Integer> idsForHistory = historyFromString(strings[i + 1]);
                         for (Integer id : idsForHistory) {
-                            if (taskMap.containsKey(id)) {
-                                historyManager.add(taskMap.get(id));
+                            if (mgr.taskMap.containsKey(id)) {
+                                mgr.inMemoryHistoryManager.add(mgr.taskMap.get(id));
+                                mgr.setId(Math.max(mgr.getId(), id));
                             }
-                            if (epicMap.containsKey(id)) {
-                                historyManager.add(epicMap.get(id));
+                            if (mgr.epicMap.containsKey(id)) {
+                                mgr.inMemoryHistoryManager.add(mgr.epicMap.get(id));
+                                mgr.setId(Math.max(mgr.getId(), id));
                             }
-                            if (subtaskMap.containsKey(id)) {
-                                historyManager.add(subtaskMap.get(id));
+                            if (mgr.subtaskMap.containsKey(id)) {
+                                mgr.inMemoryHistoryManager.add(mgr.subtaskMap.get(id));
+                                mgr.setId(Math.max(mgr.getId(), id));
                             }
                         }
-                        return;
+                        break;
                     } else {
                         Task anyTask = fromString(strings[i]);
                         if (anyTask instanceof Subtask) {
-                            subtaskMap.put(anyTask.getId(), (Subtask) anyTask);
+                            mgr.subtaskMap.put(anyTask.getId(), (Subtask) anyTask);
+                            for (Epic epic : mgr.epicMap.values()) {
+                                if (((Subtask) anyTask).getEpicId().equals(epic.getId())) {
+                                    epic.getSubtaskIdList().add(anyTask.getId());
+                                }
+                            }
                         } else if (anyTask instanceof Epic) {
-                            epicMap.put(anyTask.getId(), (Epic) anyTask);
+                            mgr.epicMap.put(anyTask.getId(), (Epic) anyTask);
                         } else {
-                            taskMap.put(anyTask.getId(), anyTask);
+                            mgr.taskMap.put(anyTask.getId(), anyTask);
                         }
                     }
                 }
@@ -101,11 +107,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 throw new ManagerSaveException("Ошибка");
             }
         }
+        return mgr;
     }
 
     static Task fromString(String value) {
         String[] string = value.split(",");
-
         TaskType taskType = TaskType.valueOf(string[1]);
         switch (taskType) {
             case TASK:
@@ -119,6 +125,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 String titleEpic = string[1];
                 Status statusEpic = Status.valueOf(string[3]);
                 String descriptionEpic = string[4];
+                // здесь я игнорирую subtaskIdList [3], он записывается, но не читается
                 return new Epic(idEpic, titleEpic, statusEpic, descriptionEpic);
             case SUBTASK:
                 Integer idSubtask = Integer.parseInt(string[0]);
@@ -197,6 +204,42 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     @Override
     public void deleteSubtask(int id) {
         super.deleteSubtask(id);
+        save();
+    }
+
+    @Override
+    public void updateTask(Task task) {
+        super.updateTask(task);
+        save();
+    }
+
+    @Override
+    public void updateEpic(Epic epic) {
+        super.updateEpic(epic);
+        save();
+    }
+
+    @Override
+    public void updateSubtask(Subtask subtask) {
+        super.updateSubtask(subtask);
+        save();
+    }
+
+    @Override
+    public void deleteTasks() {
+        super.deleteTasks();
+        save();
+    }
+
+    @Override
+    public void deleteEpics() {
+        super.deleteEpics();
+        save();
+    }
+
+    @Override
+    public void deleteSubtasks() {
+        super.deleteSubtasks();
         save();
     }
 }

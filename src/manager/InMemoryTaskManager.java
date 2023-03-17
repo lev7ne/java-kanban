@@ -9,11 +9,19 @@ import static models.Status.*;
 public class InMemoryTaskManager implements TaskManager {
     private Integer id = 0;
 
-    protected static final Map<Integer, Task> taskMap = new HashMap<>();
-    protected static final Map<Integer, Epic> epicMap = new HashMap<>();
-    protected static final Map<Integer, Subtask> subtaskMap = new HashMap<>();
+    public Integer getId() {
+        return id;
+    }
 
-    HistoryManager inMemoryHistoryManager = Managers.getDefaultInMemoryHistoryManager(); // inMemoryHistoryManager
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    protected final Map<Integer, Task> taskMap = new HashMap<>();
+    protected final Map<Integer, Epic> epicMap = new HashMap<>();
+    protected final Map<Integer, Subtask> subtaskMap = new HashMap<>();
+
+    HistoryManager inMemoryHistoryManager = Managers.getDefaultInMemoryHistoryManager();
 
     private void counterID() {
         this.id++;
@@ -48,7 +56,6 @@ public class InMemoryTaskManager implements TaskManager {
         return subtask.getId();
     }
 
-    //это вспомогательный метод, его в интерфейс не добавляю
     private void updateEpicStatus(Integer epicId) {
         int counterNew = 0;
         int counterInProgress = 0;
@@ -125,7 +132,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateEpic(Epic epic) {
         Epic someEpic = epicMap.get(epic.getId());
-        if (someEpic == null) { // перед заменой, проверяем не в пустом ли эпике, пытаемся обновить инфо
+        if (someEpic == null) {
             return;
         }
         someEpic.setName(epic.getName());

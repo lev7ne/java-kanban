@@ -9,21 +9,17 @@ public class Epic extends Task {
     public Epic(String title, String description, Status status) {
         super(title, description, status);
     }
+
     public Epic(Integer id, String title, Status status, String description) {
         super(id, title, status, description);
     }
-
 
     public List<Integer> getSubtaskIdList() {
         return subtaskIdList;
     }
 
-    public void setSubtaskIdList(List<Integer> subtaskIdList) {
-        this.subtaskIdList = subtaskIdList;
-    }
-
     @Override
     public String toString() {
-        return getId() + "," + TaskType.EPIC + "," + name + "," + this.status + "," + description + " " + name.toLowerCase();
+        return getId() + "," + TaskType.EPIC + "," + name + "," + this.status + "," + description + " " + name.toLowerCase() + "," + subtaskIdList;
     }
 }
