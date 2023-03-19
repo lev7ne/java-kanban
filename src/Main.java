@@ -7,7 +7,8 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Поехали!");
 
-        TaskManager fileBackedTasksManager = new FileBackedTasksManager();
+        String string = "src/tasks.txt";
+        TaskManager fileBackedTasksManager = new FileBackedTasksManager(string);
 
         Task task1 = new Task("название_таск", "описание_таск", NEW);
         fileBackedTasksManager.createTask(task1);
@@ -27,6 +28,5 @@ public class Main {
         fileBackedTasksManager.getEpic(2);
 
         System.out.println(fileBackedTasksManager.getHistory());
-
     }
 }

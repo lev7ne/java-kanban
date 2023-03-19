@@ -56,5 +56,4 @@ public class Task {
     public String toString() {
         return getId() + "," + TaskType.TASK + "," + name + "," + this.status + "," + description + " " + name.toLowerCase();
     }
-
 }
