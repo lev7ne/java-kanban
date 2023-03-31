@@ -1,12 +1,15 @@
-package manager;
+package main.manager;
 
-import models.Epic;
-import models.Subtask;
-import models.Task;
+import main.models.Epic;
+import main.models.Subtask;
+import main.models.Task;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
+
+    Set<Task> getPrioritizedTasks();
 
     int createTask(Task task);
 

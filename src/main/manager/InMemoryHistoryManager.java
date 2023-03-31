@@ -1,7 +1,7 @@
-package manager;
+package main.manager;
 
-import models.Node;
-import models.Task;
+import main.models.Node;
+import main.models.Task;
 
 import java.util.*;
 
@@ -14,8 +14,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         private Node first;
         private Node last;
 
-
-        public void linkLast(Task task) {
+        private void linkLast(Task task) {
             final Node l = last;
             final Node newNode = new Node(l, task, null);
             historyHashMap.put(task.getId(), newNode);
@@ -27,7 +26,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             }
         }
 
-        public List<Task> getTasks() {
+        private List<Task> getTasks() {
             List<Task> historyArrayList = new ArrayList<>();
             Node n = first;
             while (n != null) {
@@ -38,6 +37,9 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
 
         private void removeNode(Node node) {
+            if (node == null) {
+                return;
+            }
             if (node.prev == null && node.next != null) {
                 Node next = node.next;
                 next.prev = null;
@@ -57,10 +59,9 @@ public class InMemoryHistoryManager implements HistoryManager {
             }
         }
 
-        public void remove(int id) {
+        private void remove(int id) {
             removeNode(historyHashMap.remove(id));
         }
-
     }
 
     @Override
