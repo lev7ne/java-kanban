@@ -286,4 +286,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
         List<Task> list = new ArrayList<>(taskManager.getPrioritizedTasks());
         assertEquals(List.of(testTask, testSubtask1, testSubtask2), list, "Порядок не соответствует.");
     }
+
+
+
+
 }

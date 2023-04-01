@@ -83,12 +83,13 @@ public class InMemoryTaskManager implements TaskManager {
         List<Task> tasks = new ArrayList<>(getPrioritizedTasks());
         for (Task anyTask : tasks) {
             if (anyTask.getId().equals(task.getId())) {
-                return;
+                continue;
             }
             if (anyTask.getStartTime() == null) {
                 break;
             }
-            if (task.getStartTime().isBefore(anyTask.getEndTime()) && task.getEndTime().isAfter(anyTask.getStartTime())) {
+            if (task.getStartTime().isBefore(anyTask.getEndTime()) && task.getEndTime().isAfter(anyTask.getStartTime())
+            && (task.getStartTime().equals(anyTask.getEndTime()) || task.getEndTime().equals(anyTask.getStartTime()))) {
                 throw new ManagerValidateTaskException("Попытка добавить задачу, которая пересекается по времени с уже существующей задачей.");
             }
         }
@@ -98,14 +99,15 @@ public class InMemoryTaskManager implements TaskManager {
         Comparator<Task> comparator = new Comparator<Task>() {
             @Override
             public int compare(Task task1, Task task2) {
-                if (task1.getStartTime() == null) {
-                    return 1;
-                }
-                if (task2.getStartTime() == null) {
-                    return 1;
-                }
-
-                if (task1.getStartTime().isBefore(task2.getStartTime())) {
+                if (task1.getStartTime() == null && task2.getStartTime() == null) {
+                    return task1.getId().compareTo(task2.getId());
+                } else if (task1.getStartTime() == null || task2.getStartTime() == null) {
+                    if (task1.getStartTime() == null) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                } else if (task1.getStartTime().isBefore(task2.getStartTime())){
                     return -1;
                 } else if (task1.getStartTime().isAfter(task2.getStartTime())) {
                     return 1;
@@ -119,6 +121,12 @@ public class InMemoryTaskManager implements TaskManager {
         prioritizedTasks.addAll(subtaskMap.values());
         return prioritizedTasks;
     }
+
+//    так лучше не делать, иначе две разные задачи, у которых отсутствует дата начала,
+//    могут быть признаны равными (см. контракт на equals/hashCode и compareTo/Comparator: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Comparator.html)
+//            По условиям ТЗ задачи с отсутствующей датой должны относиться в конец.
+//            Т.е. если из двух задач у какой-то дата не null, то она "больше",
+//            а если у обеих задач дата не задана, то их нужно сравнивать по какому-то другому признаку, например по идентификатору
 
     @Override
     public int createTask(Task task) {

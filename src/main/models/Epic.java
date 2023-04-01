@@ -8,6 +8,7 @@ import java.util.Objects;
 
 public class Epic extends Task {
     private List<Integer> subtaskIdList = new ArrayList<>();
+    Instant endTime;
 
     public Epic(Integer id, Status status, String name, String description, Instant startTime, Duration duration, ArrayList<Integer> subtasksIds) {
         super(id, status, name, description, startTime, duration);
@@ -28,6 +29,7 @@ public class Epic extends Task {
 
     @Override
     public Instant getEndTime() {
+        endTime = startTime.plus(duration);
         return startTime.plus(duration);
     }
 
