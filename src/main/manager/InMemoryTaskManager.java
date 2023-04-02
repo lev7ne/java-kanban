@@ -92,8 +92,7 @@ public class InMemoryTaskManager implements TaskManager {
                 break;
             }
             boolean isFlag3 = (task.getStartTime().isAfter(anyTask.getEndTime()) && task.getEndTime().isAfter(anyTask.getEndTime()))
-                    && (task.getStartTime().isAfter(anyTask.getStartTime()) && task.getEndTime().isAfter(anyTask.getStartTime()));
-
+                    && (task.getStartTime().isBefore(anyTask.getStartTime()) && task.getEndTime().isBefore(anyTask.getStartTime()));
             if (!isFlag3) {
                 throw new ManagerValidateTaskException("Попытка добавить задачу, которая пересекается по времени с уже существующей задачей.");
             }
