@@ -1,2 +1,5 @@
 id;type;status;name;description;startTime;duration;epicId/SubtaskIdList
+1;TASK;NEW;задача1;описание_задачи1;2023-04-02T11:25:41.608789700Z;PT10M
+2;EPIC;NEW;эпик2;описание_эпика2;-1000000000-01-01T00:00:00Z;PT0S;[]
 
+1;2;

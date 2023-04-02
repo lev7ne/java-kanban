@@ -26,11 +26,13 @@ public class Epic extends Task {
     public void setStartTime(Instant startTime) {
         this.startTime = startTime;
     }
-
     @Override
     public Instant getEndTime() {
-        endTime = startTime.plus(duration);
-        return startTime.plus(duration);
+        return endTime;
+    }
+
+    public void setEndTime(Instant endTime) {
+        this.endTime = endTime;
     }
 
     @Override
@@ -49,10 +51,11 @@ public class Epic extends Task {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Epic)) return false;
         if (!super.equals(o)) return false;
         Epic epic = (Epic) o;
-        return subtaskIdList.equals(epic.subtaskIdList) && Objects.equals(endTime, epic.endTime);
+        return Objects.equals(subtaskIdList, epic.subtaskIdList)
+                && Objects.equals(endTime, epic.endTime);
     }
 
     @Override

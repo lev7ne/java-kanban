@@ -60,20 +60,30 @@ public class InMemoryTaskManager implements TaskManager {
         Duration epicDuration = Duration.ZERO;
         if (epic.getSubtaskIdList().isEmpty()) {
             epic.setDuration(epicDuration);
-
         } else {
-            Instant startTimeFirstSubtask = subtaskMap.get(epic.getSubtaskIdList().get(0)).getStartTime();
+            Instant epicStartTime = subtaskMap.get(epic.getSubtaskIdList().get(0)).getStartTime();
+            Instant epicEndTime = subtaskMap.get(epic.getSubtaskIdList().get(0)).getEndTime();
             for (Integer subtaskId : subtasks) {
                 Subtask someSubtask = subtaskMap.get(subtaskId);
                 epicDuration = epicDuration.plus(someSubtask.getDuration());
-                if (someSubtask.getStartTime().isBefore(startTimeFirstSubtask)) {
-                    startTimeFirstSubtask = someSubtask.getStartTime();
+                if (someSubtask.getStartTime().isBefore(epicStartTime)) {
+                    epicStartTime = someSubtask.getStartTime();
+                }
+                if (someSubtask.getEndTime().isAfter(epicEndTime)) {
+                    epicEndTime = someSubtask.getEndTime();
                 }
             }
-            epic.setStartTime(startTimeFirstSubtask);
+            epic.setStartTime(epicStartTime);
             epic.setDuration(epicDuration);
+            epic.setEndTime(epicEndTime);
         }
-
+/*
+проходимся по списку сабтасков
+находим самый ранний startTime и присваиваем его значение в epicStartTime
+находим наибольшее значение (самое позднее) startTime+duration и присваиваем значение в epicEndTime
+берем сумму всех duration и присваиваем её epicDuration
+время окончания эпика = время окончание последней подзадачи
+*/
     }
 
     protected void validateTask(Task task) {
@@ -88,10 +98,20 @@ public class InMemoryTaskManager implements TaskManager {
             if (anyTask.getStartTime() == null) {
                 break;
             }
-            if (task.getStartTime().isBefore(anyTask.getEndTime()) && task.getEndTime().isAfter(anyTask.getStartTime())
-            && (task.getStartTime().equals(anyTask.getEndTime()) || task.getEndTime().equals(anyTask.getStartTime()))) {
+
+            if (task.getStartTime().isBefore(anyTask.getEndTime()) && task.getEndTime().isAfter(anyTask.getStartTime())) {
                 throw new ManagerValidateTaskException("Попытка добавить задачу, которая пересекается по времени с уже существующей задачей.");
             }
+            /*
+            (s >= tsi && s <= tei) || (e >= tsi && e <= tei)
+            Нестрогое условие "<=" выражается либо комбинацией "isBefore || equals", либо отрицанием "!isAfter"
+
+
+            boolean isFlag = (task.getStartTime() >= anyTask.getStartTime() && (task.getStartTime().isBefore(anyTask.getEndTime()) || task.getStartTime().equals(anyTask.getEndTime())) ||
+
+            boolean isFlag2 = !(task.getStartTime().isBefore(anyTask.getStartTime())) && !(task.getStartTime().isAfter(anyTask.getEndTime())) ||
+
+            */
         }
     }
 
@@ -107,7 +127,7 @@ public class InMemoryTaskManager implements TaskManager {
                     } else {
                         return -1;
                     }
-                } else if (task1.getStartTime().isBefore(task2.getStartTime())){
+                } else if (task1.getStartTime().isBefore(task2.getStartTime())) {
                     return -1;
                 } else if (task1.getStartTime().isAfter(task2.getStartTime())) {
                     return 1;
@@ -121,12 +141,6 @@ public class InMemoryTaskManager implements TaskManager {
         prioritizedTasks.addAll(subtaskMap.values());
         return prioritizedTasks;
     }
-
-//    так лучше не делать, иначе две разные задачи, у которых отсутствует дата начала,
-//    могут быть признаны равными (см. контракт на equals/hashCode и compareTo/Comparator: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Comparator.html)
-//            По условиям ТЗ задачи с отсутствующей датой должны относиться в конец.
-//            Т.е. если из двух задач у какой-то дата не null, то она "больше",
-//            а если у обеих задач дата не задана, то их нужно сравнивать по какому-то другому признаку, например по идентификатору
 
     @Override
     public int createTask(Task task) {

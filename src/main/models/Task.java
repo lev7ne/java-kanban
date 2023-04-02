@@ -55,6 +55,7 @@ public class Task {
     public Instant getStartTime() {
         return startTime;
     }
+
     public void setStartTime(Instant startTime) {
         this.startTime = startTime;
     }
@@ -88,7 +89,12 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return Objects.equals(id, task.id) && status == task.status && Objects.equals(name, task.name) && Objects.equals(description, task.description) && Objects.equals(startTime, task.startTime) && Objects.equals(duration, task.duration);
+        return Objects.equals(id, task.id)
+                && status == task.status
+                && Objects.equals(name, task.name)
+                && Objects.equals(description, task.description)
+                && Objects.equals(startTime, task.startTime)
+                && Objects.equals(duration, task.duration);
     }
 
     @Override

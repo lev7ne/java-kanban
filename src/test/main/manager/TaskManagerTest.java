@@ -287,6 +287,18 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(List.of(testTask, testSubtask1, testSubtask2), list, "Порядок не соответствует.");
     }
 
+    @Test
+    void test() {
+
+        Task anyTask = new Task(1, Status.NEW,"задача2","описание_задачи2",
+                Instant.now(), Duration.ofMinutes(10));
+        Task anyTask2 = new Task(1, Status.NEW,"задача2","описание_задачи2",
+                Instant.now().plus(Duration.ofMinutes(5)), Duration.ofMinutes(10));
+        taskManager.createTask(anyTask);
+        taskManager.createTask(anyTask2);
+
+
+    }
 
 
 
