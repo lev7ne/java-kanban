@@ -84,11 +84,9 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                             if (anyEpic != null) {
                                 anyEpic.getSubtaskIdList().add(anySubtask.getId());
                                 mgr.subtaskMap.put(anyTask.getId(), (Subtask) anyTask);
-                                mgr.updateEpicDurationAndStartTimeAndEndTime(anyEpic.getId());
                             }
                         } else if (anyTask instanceof Epic) {
                             mgr.epicMap.put(anyTask.getId(), (Epic) anyTask);
-                            mgr.updateEpicDurationAndStartTimeAndEndTime(anyTask.getId());
                         } else {
                             mgr.taskMap.put(anyTask.getId(), anyTask);
                         }
@@ -129,12 +127,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 String descriptionEpic = string[4];
                 Instant startTimeEpic = Instant.parse(string[5]);
                 Duration durationEpic = Duration.parse(string[6]);
-                List<String> source = List.of(string[7].split(","));
+                Instant endTimeEpic = null;
+                if (!string[7].equals("null")) {
+                    endTimeEpic = Instant.parse(string[7]);
+                }
+                List<String> source = List.of(string[8].split(","));
                 ArrayList<Integer> subtaskIdsEpic = new ArrayList<>();
                 for (int i = 1; i < source.size() - 2; i++) {
                     subtaskIdsEpic.add(Integer.parseInt(source.get(i)));
                 }
-                return new Epic(idEpic, statusEpic, nameEpic, descriptionEpic, startTimeEpic, durationEpic, subtaskIdsEpic);
+                Epic newEpic = new Epic(idEpic, statusEpic, nameEpic, descriptionEpic, startTimeEpic, durationEpic, subtaskIdsEpic);
+                newEpic.setEndTime(endTimeEpic);
+                return newEpic;
             case SUBTASK:
                 Integer idSubtask = Integer.parseInt(string[0]);
                 Status statusSubtask = Status.valueOf(string[2]);
@@ -158,7 +162,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     + task.getStartTime() + ";"
                     + task.getDuration() + ";"
                     + ((Subtask) task).getEpicId();
-
         } else if (task instanceof Epic) {
 
             return task.getId() + ";"
@@ -168,6 +171,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     + task.getDescription() + ";"
                     + task.getStartTime() + ";"
                     + task.getDuration() + ";"
+                    + task.getEndTime() + ";"
                     + ((Epic) task).getSubtaskIdList();
         } else {
             return task.getId() + ";"
