@@ -84,9 +84,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                             if (anyEpic != null) {
                                 anyEpic.getSubtaskIdList().add(anySubtask.getId());
                                 mgr.subtaskMap.put(anyTask.getId(), (Subtask) anyTask);
+                                mgr.updateEpicDurationAndStartTimeAndEndTime(anyEpic.getId());
                             }
                         } else if (anyTask instanceof Epic) {
                             mgr.epicMap.put(anyTask.getId(), (Epic) anyTask);
+                            mgr.updateEpicDurationAndStartTimeAndEndTime(anyTask.getId());
                         } else {
                             mgr.taskMap.put(anyTask.getId(), anyTask);
                         }

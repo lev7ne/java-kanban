@@ -48,21 +48,15 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
         int testEpicId = taskManager.createEpic(testEpic);
         int testSubtask1Id = taskManager.createSubtask(testSubtask1);
         int testSubtask2Id = taskManager.createSubtask(testSubtask2);
-
         taskManager.getTask(testTaskId);
         taskManager.getEpic(testEpicId);
         taskManager.getSubtask(testSubtask1Id);
         taskManager.getSubtask(testSubtask2Id);
-
         FileBackedTasksManager taskManager2 = FileBackedTasksManager.loadFromFile(string);
         assertEquals(taskManager.getTask(testTaskId), taskManager2.getTask(testTaskId), "Задача восстановилась некорректно");
-
-        
-        System.out.println(taskManager.getEpic(testEpicId).hashCode());
-        System.out.println(taskManager2.getEpic(testEpicId).hashCode());
-        //assertEquals(taskManager.getEpic(testEpicId), taskManager2.getEpic(testEpicId), "Эпик восстановился некорректно");
+        assertEquals(taskManager.getEpic(testEpicId), taskManager2.getEpic(testEpicId), "Эпик восстановился некорректно");
         assertEquals(List.of(testSubtask1.getId(), testSubtask2.getId()), ((Epic) taskManager2.getEpic(testEpicId)).getSubtaskIdList(), "Подзадачи восстановились некорректно");
-        //assertEquals(taskManager.getHistory(), taskManager2.getHistory(), "История не совпадает.");
+        assertEquals(taskManager.getHistory(), taskManager2.getHistory(), "История не совпадает.");
     }
 
     @Test

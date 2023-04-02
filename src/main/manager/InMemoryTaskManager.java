@@ -54,7 +54,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    protected void updateEpicDuration(Integer epicId) {
+    protected void updateEpicDurationAndStartTimeAndEndTime(Integer epicId) {
         Epic epic = epicMap.get(epicId);
         List<Integer> subtasks = epic.getSubtaskIdList();
         Duration epicDuration = Duration.ZERO;
@@ -77,13 +77,6 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setDuration(epicDuration);
             epic.setEndTime(epicEndTime);
         }
-/*
-проходимся по списку сабтасков
-находим самый ранний startTime и присваиваем его значение в epicStartTime
-находим наибольшее значение (самое позднее) startTime+duration и присваиваем значение в epicEndTime
-берем сумму всех duration и присваиваем её epicDuration
-время окончания эпика = время окончание последней подзадачи
-*/
     }
 
     protected void validateTask(Task task) {
@@ -98,20 +91,12 @@ public class InMemoryTaskManager implements TaskManager {
             if (anyTask.getStartTime() == null) {
                 break;
             }
+            boolean isFlag3 = (task.getStartTime().isAfter(anyTask.getEndTime()) && task.getEndTime().isAfter(anyTask.getEndTime()))
+                    && (task.getStartTime().isAfter(anyTask.getStartTime()) && task.getEndTime().isAfter(anyTask.getStartTime()));
 
-            if (task.getStartTime().isBefore(anyTask.getEndTime()) && task.getEndTime().isAfter(anyTask.getStartTime())) {
+            if (!isFlag3) {
                 throw new ManagerValidateTaskException("Попытка добавить задачу, которая пересекается по времени с уже существующей задачей.");
             }
-            /*
-            (s >= tsi && s <= tei) || (e >= tsi && e <= tei)
-            Нестрогое условие "<=" выражается либо комбинацией "isBefore || equals", либо отрицанием "!isAfter"
-
-
-            boolean isFlag = (task.getStartTime() >= anyTask.getStartTime() && (task.getStartTime().isBefore(anyTask.getEndTime()) || task.getStartTime().equals(anyTask.getEndTime())) ||
-
-            boolean isFlag2 = !(task.getStartTime().isBefore(anyTask.getStartTime())) && !(task.getStartTime().isAfter(anyTask.getEndTime())) ||
-
-            */
         }
     }
 
@@ -144,8 +129,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int createTask(Task task) {
-        validateTask(task);
         counterID();
+        validateTask(task);
         task.setId(id);
         taskMap.put(task.getId(), task);
         return task.getId();
@@ -161,15 +146,15 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int createSubtask(Subtask subtask) {
-        validateTask(subtask);
         counterID();
+        validateTask(subtask);
         subtask.setId(id);
         subtaskMap.put(subtask.getId(), subtask);
         Epic epic = epicMap.get(subtask.getEpicId());
         if (epic != null) {
             epic.getSubtaskIdList().add(id);
             updateEpicStatus(subtask.getEpicId());
-            updateEpicDuration(subtask.getEpicId());
+            updateEpicDurationAndStartTimeAndEndTime(subtask.getEpicId());
         }
         return subtask.getId();
     }
@@ -245,7 +230,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         subtaskMap.put(subtask.getId(), subtask);
         updateEpicStatus(subtask.getEpicId());
-        updateEpicDuration(subtask.getEpicId());
+        updateEpicDurationAndStartTimeAndEndTime(subtask.getEpicId());
     }
 
     @Override
@@ -275,7 +260,7 @@ public class InMemoryTaskManager implements TaskManager {
             pair.getValue().getSubtaskIdList().remove((Integer) id);
         }
         updateEpicStatus(epicId);
-        updateEpicDuration(epicId);
+        updateEpicDurationAndStartTimeAndEndTime(epicId);
         inMemoryHistoryManager.remove(id);
     }
 

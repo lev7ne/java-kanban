@@ -1,11 +1,9 @@
 package main.manager;
 
-import main.models.Epic;
-import main.models.Status;
-import main.models.Subtask;
-import main.models.Task;
+import main.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -216,7 +214,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubtask(testSubtask2);
         Duration resultDuration = testSubtask1.getDuration().plus(testSubtask2.getDuration());
         Instant resultStartTime = testSubtask1.getStartTime().isBefore(testSubtask2.getStartTime()) ? testSubtask1.getStartTime() : testSubtask2.getStartTime();
-        Instant resultEndTime = resultStartTime.plus(resultDuration);
+        Instant resultEndTime = testSubtask1.getEndTime().isAfter(testSubtask2.getEndTime()) ? testSubtask1.getEndTime() : testSubtask2.getEndTime();
         assertEquals(testEpic.getDuration(), resultDuration, "Epic.duration считается некорректно.");
         assertEquals(testEpic.getStartTime(), resultStartTime, "Epic.startTime считается некорректно.");
         assertEquals(testEpic.getEndTime(), resultEndTime, "Epic.endTime считается некорректно.");
@@ -288,18 +286,20 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void test() {
-
-        Task anyTask = new Task(1, Status.NEW,"задача2","описание_задачи2",
-                Instant.now(), Duration.ofMinutes(10));
-        Task anyTask2 = new Task(1, Status.NEW,"задача2","описание_задачи2",
+    void shouldThrowManagerValidateTaskException() {
+        Task anyTask2 = new Task(2, Status.NEW,"задача2","описание_задачи2",
                 Instant.now().plus(Duration.ofMinutes(5)), Duration.ofMinutes(10));
-        taskManager.createTask(anyTask);
-        taskManager.createTask(anyTask2);
+        taskManager.createTask(testTask);
+        taskManager.createEpic(testEpic);
+        taskManager.createSubtask(testSubtask1);
+        taskManager.createSubtask(testSubtask2);
 
-
+        assertThrows(ManagerValidateTaskException.class,
+                new Executable() {
+                    @Override
+                    public void execute() {
+                        taskManager.createTask(anyTask2);
+                    }
+                });
     }
-
-
-
 }
