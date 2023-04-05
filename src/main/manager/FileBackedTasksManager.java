@@ -19,7 +19,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         this.path = Paths.get(string);
     }
 
-    private void save() {
+    protected void save() {
         if (!Files.exists(path)) {
             try {
                 Files.createFile(path);
@@ -74,6 +74,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                                 mgr.inMemoryHistoryManager.add(mgr.subtaskMap.get(id));
                             }
                         }
+
                         break;
                     } else {
                         Task anyTask = fromString(strings[i]);
