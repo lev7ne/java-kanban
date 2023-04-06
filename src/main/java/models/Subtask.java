@@ -1,4 +1,4 @@
-package main.models;
+package models;
 
 import java.time.Duration;
 import java.time.Instant;

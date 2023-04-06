@@ -1,9 +1,9 @@
-package main.manager;
-
-import main.models.Epic;
-import main.models.Status;
-import main.models.Subtask;
-import main.models.Task;
+import manager.HistoryManager;
+import manager.InMemoryHistoryManager;
+import models.Epic;
+import models.Status;
+import models.Subtask;
+import models.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

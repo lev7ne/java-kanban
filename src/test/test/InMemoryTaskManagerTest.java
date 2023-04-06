@@ -1,7 +1,7 @@
-package main.manager;
-
-import main.models.Status;
-import main.models.Task;
+import manager.InMemoryTaskManager;
+import manager.Managers;
+import models.Status;
+import models.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

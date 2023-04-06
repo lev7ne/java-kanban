@@ -1,4 +1,4 @@
-package main.models;
+package models;
 
 public class ManagerSaveException extends RuntimeException {
     public ManagerSaveException(final String message) {

@@ -1,6 +1,6 @@
-package main.manager;
+package manager;
 
-import main.models.*;
+import models.*;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,10 +13,11 @@ import java.time.Instant;
 import java.util.*;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-    final Path path;
+    String pathInString = "src/tasks.txt";
+    Path path = Paths.get(pathInString);
 
-    public FileBackedTasksManager(String string) {
-        this.path = Paths.get(string);
+    public String getPathInString() {
+        return pathInString;
     }
 
     protected void save() {
@@ -55,7 +56,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTasksManager loadFromFile(String string) {
-        FileBackedTasksManager mgr = new FileBackedTasksManager(string);
+        FileBackedTasksManager mgr = new FileBackedTasksManager();
         if (Files.exists(mgr.path)) {
             try {
                 String data = Files.readString(mgr.path);

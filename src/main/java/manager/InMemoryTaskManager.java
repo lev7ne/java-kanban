@@ -1,12 +1,15 @@
-package main.manager;
+package manager;
 
-import main.models.*;
+import models.Epic;
+import models.ManagerValidateTaskException;
+import models.Subtask;
+import models.Task;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
-import static main.models.Status.*;
+import static models.Status.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private Integer id = 0;

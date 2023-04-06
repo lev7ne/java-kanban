@@ -1,7 +1,7 @@
-package main.manager;
+package manager;
 
-import main.models.Node;
-import main.models.Task;
+import models.Node;
+import models.Task;
 
 import java.util.*;
 

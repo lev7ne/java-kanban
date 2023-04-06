@@ -1,6 +1,6 @@
-package main.manager;
+package manager;
 
-import main.models.Task;
+import models.Task;
 
 import java.util.List;
 
