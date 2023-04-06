@@ -1,4 +1,4 @@
-package manager;
+package managers;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

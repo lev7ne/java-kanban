@@ -1,4 +1,7 @@
-import manager.TaskManager;
+package managers;
+
+import exceptions.ManagerValidateTaskException;
+import managers.TaskManager;
 import models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

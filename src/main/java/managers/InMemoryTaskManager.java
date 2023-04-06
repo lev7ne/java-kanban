@@ -1,7 +1,7 @@
-package manager;
+package managers;
 
 import models.Epic;
-import models.ManagerValidateTaskException;
+import exceptions.ManagerValidateTaskException;
 import models.Subtask;
 import models.Task;
 

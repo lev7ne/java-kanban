@@ -1,5 +1,7 @@
-package manager;
+package managers;
 
+import exceptions.ManagerLoadException;
+import exceptions.ManagerSaveException;
 import models.*;
 
 import java.io.FileWriter;
@@ -13,7 +15,7 @@ import java.time.Instant;
 import java.util.*;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
-    String pathInString = "src/tasks.txt";
+    String pathInString = "src/main/resources/tasks.txt";
     Path path = Paths.get(pathInString);
 
     public String getPathInString() {
@@ -25,10 +27,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             try {
                 Files.createFile(path);
             } catch (IOException e) {
-                throw new ManagerSaveException("Ошибка");
+                throw new ManagerSaveException("Ошибка при создании файла");
             }
         }
-        try (Writer fileWriter = new FileWriter("src/tasks.txt")) {
+        try (Writer fileWriter = new FileWriter("src/main/resources/tasks.txt")) {
             fileWriter.append("id;type;status;name;description;startTime;duration;epicId/SubtaskIdList" + "\n");
             for (Map.Entry<Integer, Task> pair : taskMap.entrySet()) {
                 fileWriter.write(FileBackedTasksManager.toCsvFormatConverter(pair.getValue()) + "\n");
@@ -55,7 +57,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return sb.toString();
     }
 
-    public static FileBackedTasksManager loadFromFile(String string) {
+    public static FileBackedTasksManager loadFromFile(String pathInString) {
         FileBackedTasksManager mgr = new FileBackedTasksManager();
         if (Files.exists(mgr.path)) {
             try {
@@ -95,6 +97,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                     }
                 }
             } catch (IOException e) {
+                System.err.println(e);
                 throw new ManagerLoadException("Ошибка");
             }
         }

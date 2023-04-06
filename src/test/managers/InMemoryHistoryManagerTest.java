@@ -1,5 +1,7 @@
-import manager.HistoryManager;
-import manager.InMemoryHistoryManager;
+package managers;
+
+import managers.HistoryManager;
+import managers.InMemoryHistoryManager;
 import models.Epic;
 import models.Status;
 import models.Subtask;

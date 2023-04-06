@@ -1,5 +1,5 @@
-import manager.InMemoryTaskManager;
-import manager.Managers;
+package managers;
+
 import models.Status;
 import models.Task;
 import org.junit.jupiter.api.BeforeEach;
