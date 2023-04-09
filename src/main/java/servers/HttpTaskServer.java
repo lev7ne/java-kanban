@@ -5,6 +5,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import managers.HttpTaskManager;
 import managers.Managers;
+import models.Epic;
+import models.Subtask;
 import models.Task;
 
 import java.io.IOException;
@@ -19,6 +21,7 @@ public class HttpTaskServer {
     private HttpServer httpServer;
     private Gson gson;
     private HttpTaskManager httpTaskManager;
+    private static String key = "1";
 
     public HttpTaskServer(HttpTaskManager httpTaskManager) throws IOException {
         this.httpTaskManager = httpTaskManager;
@@ -28,7 +31,7 @@ public class HttpTaskServer {
     }
 
     public static void main(String[] args) throws IOException {
-        HttpTaskServer httpTaskServer = new HttpTaskServer(Managers.getDefaultHttpTaskManager());
+        HttpTaskServer httpTaskServer = new HttpTaskServer(Managers.getDefaultHttpTaskManager("http://localhost:", PORT, key));
         httpTaskServer.start();
         //httpTaskServer.stop();
     }
@@ -39,18 +42,31 @@ public class HttpTaskServer {
         String query = httpExchange.getRequestURI().getQuery(); // извлекаем "строку запроса"
 
         String[] pathParts = path.split("/"); // делим путь
-        // http://localhost:8080/tasks/task
-
+        //http://localhost:8080/tasks/task
         String response;
+
         if (pathParts.length == 2) {
             Set<Task> responsePrioritizedTasks = httpTaskManager.getPrioritizedTasks();
             response = gson.toJson(responsePrioritizedTasks);
             writeResponse(httpExchange, response, 200);
-            return;
         }
+
         switch (pathParts[2]) {
             case "task":
                 handleTask(httpExchange, requestMethod, query);
+                break;
+            case "epic":
+                handleEpic(httpExchange, requestMethod, query);
+                break;
+            case "subtask":
+                handleSubtask(httpExchange, requestMethod, query);
+                break;
+            case "history":
+                if (httpTaskManager.getHistory().isEmpty()) {
+                    writeResponse(httpExchange, "История пустая.", 200);
+                } else {
+                    writeResponse(httpExchange, gson.toJson(httpTaskManager.getHistory()), 200);
+                }
                 break;
         }
     }
@@ -70,30 +86,184 @@ public class HttpTaskServer {
         if (query == null) {
             switch (requestMethod) {
                 case "GET":
-                    response = gson.toJson(httpTaskManager.getTask(parseId(query)));
+                    response = gson.toJson(httpTaskManager.getTasks());
                     writeResponse(httpExchange, response, 200);
                     break;
                 case "POST":
-                    String string = new String(httpExchange.getRequestBody().readAllBytes());
-                    Task task = gson.fromJson(string, Task.class);
-                    id = httpTaskManager.createTask(task);
-                    writeResponse(httpExchange, "Создана задача: " + id, 200);
+                    String string = new String(httpExchange.getRequestBody().readAllBytes(), UTF_8);
+                    Task newTask = gson.fromJson(string, Task.class);
+                    if (newTask == null) {
+                        break;
+                    }
+                    if (httpTaskManager.getTasks().size() != 0) {
+                        for (Task task : httpTaskManager.getTasks()) {
+                            if (task.getId() == newTask.getId()) {
+                                httpTaskManager.updateTask(newTask);
+                                writeResponse(httpExchange, "Задача c id=" + newTask.getId() + " обновлена.", 200);
+                            } else {
+                                id = httpTaskManager.createTask(newTask);
+                                writeResponse(httpExchange, "Создана задача c id=" + id + ".", 200);
+                                break;
+                            }
+                        }
+                    } else {
+                        id = httpTaskManager.createTask(newTask);
+                        writeResponse(httpExchange, "Создана задача c id=" + id + ".", 200);
+                    }
                     break;
                 case "DELETE":
                     httpTaskManager.deleteTasks();
-                    writeResponse(httpExchange, "Удалена задача: " + parseId(query), 200);
+                    writeResponse(httpExchange, "Все задачи удалены.", 200);
                     break;
                 default:
                     writeResponse(httpExchange, "Метод не поддерживается.", 404);
             }
         } else {
-
+            if (parseId(query) != -1) {
+                if (httpTaskManager.getTaskMap().containsKey(parseId(query))) {
+                    switch (requestMethod) {
+                        case "GET":
+                            writeResponse(httpExchange, gson.toJson(httpTaskManager.getTask(parseId(query))), 200);
+                            break;
+                        case "DELETE":
+                            httpTaskManager.deleteTask(parseId(query));
+                            writeResponse(httpExchange, "Задача с id=" + parseId(query) + " успешно удалена.", 200);
+                            break;
+                        default:
+                            writeResponse(httpExchange, "Метод не поддерживается.", 404);
+                    }
+                } else {
+                    writeResponse(httpExchange, "Задача с id=" + parseId(query) + " не создана.", 404);
+                }
+            } else {
+                writeResponse(httpExchange, "Получен неверный id=" + parseId(query) + ".", 404);
+            }
         }
     }
 
-    // дальше необходимо в зависимости от содержимого path[2] использовать какой-то handle (таск, эпик, сабтаск, история),
-    // если pathPart.length == 2, ответ будет getPrioritizedTasks()
+    private void handleEpic(HttpExchange httpExchange, String requestMethod, String query) throws IOException {
+        String response;
+        int id;
+        if (query == null) {
+            switch (requestMethod) {
+                case "GET":
+                    response = gson.toJson(httpTaskManager.getEpics());
+                    writeResponse(httpExchange, response, 200);
+                    break;
+                case "POST":
+                    String string = new String(httpExchange.getRequestBody().readAllBytes(), UTF_8);
+                    Epic newEpic = gson.fromJson(string, Epic.class);
+                    if (newEpic == null) {
+                        break;
+                    }
+                    if (httpTaskManager.getEpics().size() != 0) {
+                        for (Epic epic : httpTaskManager.getEpics()) {
+                            if (epic.getId() == newEpic.getId()) {
+                                httpTaskManager.updateEpic(newEpic);
+                                writeResponse(httpExchange, "Эпик c id=" + newEpic.getId() + " обновлен.", 200);
+                            } else {
+                                id = httpTaskManager.createEpic(newEpic);
+                                writeResponse(httpExchange, "Создан эпик c id=" + id + ".", 200);
+                                break;
+                            }
+                        }
+                    } else {
+                        id = httpTaskManager.createEpic(newEpic);
+                        writeResponse(httpExchange, "Создан эпик c id=" + id + ".", 200);
+                    }
+                    break;
+                case "DELETE":
+                    httpTaskManager.deleteEpics();
+                    writeResponse(httpExchange, "Все эпики удалены.", 200);
+                    break;
+                default:
+                    writeResponse(httpExchange, "Метод не поддерживается.", 404);
+            }
+        } else {
+            if (parseId(query) != -1) {
+                if (httpTaskManager.getEpicMap().containsKey(parseId(query))) {
+                    switch (requestMethod) {
+                        case "GET":
+                            writeResponse(httpExchange, gson.toJson(httpTaskManager.getEpic(parseId(query))), 200);
+                            break;
+                        case "DELETE":
+                            httpTaskManager.deleteEpic(parseId(query));
+                            writeResponse(httpExchange, "Эпик с id=" + parseId(query) + " успешно удален.", 200);
+                            break;
+                        default:
+                            writeResponse(httpExchange, "Метод не поддерживается.", 404);
+                    }
+                } else {
+                    writeResponse(httpExchange, "Получен неверный id=" + parseId(query) + ".", 404);
+                }
+            } else {
+                writeResponse(httpExchange, "Получен неверный id=" + parseId(query) + ".", 404);
+            }
+        }
+    }
 
+    private void handleSubtask(HttpExchange httpExchange, String requestMethod, String query) throws IOException {
+        String response;
+        int id;
+        if (query == null) {
+            switch (requestMethod) {
+                case "GET":
+                    response = gson.toJson(httpTaskManager.getSubtasks());
+                    writeResponse(httpExchange, response, 200);
+                    break;
+                case "POST":
+                    String string = new String(httpExchange.getRequestBody().readAllBytes(), UTF_8);
+                    Subtask newSubtask = gson.fromJson(string, Subtask.class);
+                    if (newSubtask == null) {
+                        break;
+                    } else {
+                        if (httpTaskManager.getSubtasks().size() != 0) {
+                            for (Subtask subtask : httpTaskManager.getSubtasks()) {
+                                if (subtask.getId() == newSubtask.getId()) {
+                                    httpTaskManager.updateSubtask(newSubtask);
+                                    writeResponse(httpExchange, "Подзадача c id=" + newSubtask.getId() + " обновлена.", 200);
+                                } else {
+                                    id = httpTaskManager.createSubtask(newSubtask);
+                                    writeResponse(httpExchange, "Создана подзадача c id=" + id + ".", 200);
+                                    break;
+                                }
+                            }
+                        } else {
+                            id = httpTaskManager.createSubtask(newSubtask);
+                            writeResponse(httpExchange, "Создана подзадача c id=" + id + ".", 200);
+                            return;
+                        }
+                    }
+                    break;
+                case "DELETE":
+                    httpTaskManager.deleteSubtasks();
+                    writeResponse(httpExchange, "Все подзадачи удалены.", 200);
+                    break;
+                default:
+                    writeResponse(httpExchange, "Метод не поддерживается.", 404);
+            }
+        } else {
+            if (parseId(query) != -1) {
+                if (httpTaskManager.getSubtaskMap().containsKey(parseId(query))) {
+                    switch (requestMethod) {
+                        case "GET":
+                            writeResponse(httpExchange, gson.toJson(httpTaskManager.getSubtask(parseId(query))), 200);
+                            break;
+                        case "DELETE":
+                            httpTaskManager.deleteSubtask(parseId(query));
+                            writeResponse(httpExchange, "Подзадача с id=" + parseId(query) + " успешно удалена.", 200);
+                            break;
+                        default:
+                            writeResponse(httpExchange, "Метод не поддерживается.", 404);
+                    }
+                } else {
+                    writeResponse(httpExchange, "Получен неверный id=" + parseId(query) + ".", 404);
+                }
+            } else {
+                writeResponse(httpExchange, "Получен неверный id=" + parseId(query) + ".", 404);
+            }
+        }
+    }
 
     public void start() {
         System.out.println("Запускаем сервер на порту " + PORT);

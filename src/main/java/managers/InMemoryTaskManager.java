@@ -22,6 +22,18 @@ public class InMemoryTaskManager implements TaskManager {
         this.id = id;
     }
 
+    public Map<Integer, Task> getTaskMap() {
+        return taskMap;
+    }
+
+    public Map<Integer, Epic> getEpicMap() {
+        return epicMap;
+    }
+
+    public Map<Integer, Subtask> getSubtaskMap() {
+        return subtaskMap;
+    }
+
     protected final Map<Integer, Task> taskMap = new HashMap<>();
     protected final Map<Integer, Epic> epicMap = new HashMap<>();
     protected final Map<Integer, Subtask> subtaskMap = new HashMap<>();
@@ -154,7 +166,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtaskMap.put(subtask.getId(), subtask);
         Epic epic = epicMap.get(subtask.getEpicId());
         if (epic != null) {
-            epic.getSubtaskIdList().add(id);
+            epic.getSubtaskIdList().add(subtask.getId());
             updateEpicStatus(subtask.getEpicId());
             updateEpicDurationAndStartTimeAndEndTime(subtask.getEpicId());
         }

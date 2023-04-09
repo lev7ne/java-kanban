@@ -12,7 +12,7 @@ import com.sun.net.httpserver.HttpServer;
 
 
 public class KVServer {
-    public static final int PORT = 8078;
+    public static final int PORT = 8080;
     private final String apiToken;
     private final HttpServer server;
     private final Map<String, String> data = new HashMap<>();
@@ -25,8 +25,37 @@ public class KVServer {
         server.createContext("/load", this::load);
     }
 
-    private void load(HttpExchange h) {
+    private void load(HttpExchange h) throws IOException {
         // TODO Добавьте получение значения по ключу
+        try {
+            System.out.println("\n/load");
+            if (!hasAuth(h)) {
+                System.out.println("Запрос не авторизован, нужен параметр в query API_TOKEN со значением апи-ключа");
+                h.sendResponseHeaders(403, 0);
+                return;
+            }
+            if ("GET".equals(h.getRequestMethod())) {
+                String key = h.getRequestURI().getPath().substring("/load/".length());
+                if (key.isEmpty()) {
+                    System.out.println("Key для получения данных пустой. key указывается в пути: /load/{key}");
+                    h.sendResponseHeaders(400, 0);
+                    return;
+                }
+                if (data.containsKey(key)) {
+                    h.sendResponseHeaders(200, 0);
+                    byte[] value = data.get(key).getBytes();
+                    h.getResponseBody().write(value);
+                } else {
+                    System.out.println("Key для получения данных не найден");
+                    h.sendResponseHeaders(400, 0);
+                }
+            } else {
+                System.out.println("/load ждёт GET-запрос, а получил: " + h.getRequestMethod());
+                h.sendResponseHeaders(405, 0);
+            }
+        } finally {
+            h.close();
+        }
     }
 
     private void save(HttpExchange h) throws IOException {

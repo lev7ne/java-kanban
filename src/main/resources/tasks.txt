@@ -1,2 +1,3 @@
 id;type;status;name;description;startTime;duration;epicId/SubtaskIdList
+1;EPIC;null;эпик;описание;null;null;null;[]
 

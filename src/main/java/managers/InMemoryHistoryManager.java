@@ -70,6 +70,9 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private void addInformationInHistoryLinkedList(Task task) {
+        if (task == null) {
+            return;
+        }
         if (history.historyHashMap.containsKey(task.getId())) {
             history.remove(task.getId());
         }
