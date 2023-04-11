@@ -9,7 +9,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     CustomLinkedList history = new CustomLinkedList();
 
     class CustomLinkedList {
-
         Map<Integer, Node> historyHashMap = new HashMap<>();
         private Node first;
         private Node last;
