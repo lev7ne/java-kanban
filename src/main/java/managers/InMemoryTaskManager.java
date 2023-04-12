@@ -13,27 +13,12 @@ import static models.Status.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private Integer id = 0;
-
     public Integer getId() {
         return id;
     }
-
     public void setId(Integer id) {
         this.id = id;
     }
-
-    public Map<Integer, Task> getTaskMap() {
-        return taskMap;
-    }
-
-    public Map<Integer, Epic> getEpicMap() {
-        return epicMap;
-    }
-
-    public Map<Integer, Subtask> getSubtaskMap() {
-        return subtaskMap;
-    }
-
     protected final Map<Integer, Task> taskMap = new HashMap<>();
     protected final Map<Integer, Epic> epicMap = new HashMap<>();
     protected final Map<Integer, Subtask> subtaskMap = new HashMap<>();

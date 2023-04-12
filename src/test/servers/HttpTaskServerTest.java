@@ -90,25 +90,35 @@ public class HttpTaskServerTest {
                 .GET()
                 .build();
         HttpResponse<String> response2 = getResponse(request2);
-
         assertEquals(response2.statusCode(), 200);
+
+        Task task = gson.fromJson(response2.body(), Task.class);
+        assertEquals(task, testTask1, "Задачи отличаются.");
     }
 
     @DisplayName("Проверка обработки запроса POST и GET с Epic")
     @Test
     void shouldWorkPostAndGetWithEpic() {
         httpTaskManager.createTask(testTask1);
-
-        URI url = URI.create("http://localhost:8080/tasks/epic");
-        String json = gson.toJson(testEpic2);
-        HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(url)
-                .POST(body)
+        URI url1 = URI.create("http://localhost:8080/tasks/epic");
+        String json1 = gson.toJson(testEpic2);
+        HttpRequest.BodyPublisher body1 = HttpRequest.BodyPublishers.ofString(json1);
+        HttpRequest request1 = HttpRequest.newBuilder()
+                .uri(url1)
+                .POST(body1)
                 .build();
-        HttpResponse<String> response = getResponse(request);
-
+        HttpResponse<String> response = getResponse(request1);
         assertEquals("Создан эпик c id=" + testEpic2.getId() + ".", response.body());
+
+        URI url2 = URI.create("http://localhost:8080/tasks/epic?id=" + testEpic2.getId());
+        HttpRequest request2 = HttpRequest.newBuilder()
+                .uri(url2)
+                .GET()
+                .build();
+        HttpResponse<String> response2 = getResponse(request2);
+
+        Epic epic = gson.fromJson(response2.body(), Epic.class);
+        assertEquals(epic, testEpic2, "Эпики отличаются.");
     }
 
     @Test
@@ -185,7 +195,7 @@ public class HttpTaskServerTest {
         assertEquals(httpTaskManager.getTask(anyId), updateTestTask, "Задачи отличаются.");
     }
 
-    @DisplayName("Проверка, если история пустая.")
+    @DisplayName("Проверка ответа, если история пустая.")
     @Test
     void complexTest() {
         httpTaskManager.createTask(testTask1);

@@ -1,6 +1,7 @@
 package managers;
 
 import com.google.gson.Gson;
+import exceptions.ManagerLoadException;
 import models.Epic;
 import models.Subtask;
 import models.Task;
@@ -15,10 +16,13 @@ public class HttpTaskManager extends FileBackedTasksManager {
     private KVTaskClient kvTaskClient;
     Gson json;
 
-    HttpTaskManager(int port) {
+    HttpTaskManager(int port, boolean needLoad) {
         kvTaskClient = new KVTaskClient(port);
         json = Managers.getGson();
-        load();
+
+        if (needLoad) {
+            load();
+        }
     }
 
     @Override
@@ -36,19 +40,29 @@ public class HttpTaskManager extends FileBackedTasksManager {
     }
 
     private void load() {
+        int counterId = 0;
+
         try {
             List<Task> tasks = Arrays.asList(json.fromJson(kvTaskClient.load("tasks"), Task[].class));
             for (Task task : tasks) {
                 taskMap.put(task.getId(), task);
+                counterId = Math.max(counterId, task.getId());
             }
             List<Epic> epics = Arrays.asList(json.fromJson(kvTaskClient.load("epics"), Epic[].class));
             for (Epic epic : epics) {
                 epicMap.put(epic.getId(), epic);
+                counterId = Math.max(counterId, epic.getId());
             }
             List<Subtask> subtasks = Arrays.asList(json.fromJson(kvTaskClient.load("subtasks"), Subtask[].class));
             for (Subtask subtask : subtasks) {
                 subtaskMap.put(subtask.getId(), subtask);
+                counterId = Math.max(counterId, subtask.getId());
             }
+
+            if (counterId > 0) {
+                setId(counterId);
+            }
+
             List<String> history = Arrays.asList(json.fromJson(kvTaskClient.load("history"), String[].class));
             for (String elem : history) {
                 int id = Integer.parseInt(elem);
@@ -63,7 +77,7 @@ public class HttpTaskManager extends FileBackedTasksManager {
                 }
             }
         } catch (Exception e) {
-            System.out.println("Нет исходных данных. " + e);
+            throw new ManagerLoadException("Нет исходных данных.");
         }
     }
 }

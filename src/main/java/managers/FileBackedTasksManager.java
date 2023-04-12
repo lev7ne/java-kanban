@@ -57,7 +57,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         return sb.toString();
     }
 
-    public static FileBackedTasksManager loadFromFile(String pathInString) {
+    public static FileBackedTasksManager loadFromFile() {
         FileBackedTasksManager mgr = new FileBackedTasksManager();
         if (Files.exists(mgr.path)) {
             try {
@@ -77,7 +77,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                                 mgr.inMemoryHistoryManager.add(mgr.subtaskMap.get(id));
                             }
                         }
-
                         break;
                     } else {
                         Task anyTask = fromString(strings[i]);
@@ -98,7 +97,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 }
             } catch (IOException e) {
                 System.err.println(e);
-                throw new ManagerLoadException("Ошибка");
+                throw new ManagerLoadException("Ошибка при загрузке и файла.");
             }
         }
         return mgr;

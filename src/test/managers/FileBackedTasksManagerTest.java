@@ -51,7 +51,7 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
         taskManager.getEpic(testEpicId);
         taskManager.getSubtask(testSubtask1Id);
         taskManager.getSubtask(testSubtask2Id);
-        FileBackedTasksManager taskManager2 = FileBackedTasksManager.loadFromFile(taskManager.getPathInString());
+        FileBackedTasksManager taskManager2 = FileBackedTasksManager.loadFromFile();
         assertEquals(taskManager.getTask(testTaskId), taskManager2.getTask(testTaskId), "Задача восстановилась некорректно");
         assertEquals(taskManager.getEpic(testEpicId), taskManager2.getEpic(testEpicId), "Эпик восстановился некорректно");
         assertEquals(List.of(testSubtask1.getId(), testSubtask2.getId()), ((Epic) taskManager2.getEpic(testEpicId)).getSubtaskIdList(), "Подзадачи восстановились некорректно");
@@ -64,21 +64,21 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
         taskManager.createEpic(testEpic);
         taskManager.createSubtask(testSubtask1);
         taskManager.createSubtask(testSubtask2);
-        FileBackedTasksManager taskManager2 = FileBackedTasksManager.loadFromFile(taskManager.getPathInString());
+        FileBackedTasksManager taskManager2 = FileBackedTasksManager.loadFromFile();
         assertTrue(taskManager2.getHistory().isEmpty(), "Список истории не пустой.");
     }
 
     @Test
     void shouldReturnEmptyTasksList() throws IOException {
         Files.delete(Path.of(taskManager.getPathInString()));
-        FileBackedTasksManager taskManager2 = FileBackedTasksManager.loadFromFile(taskManager.getPathInString());
+        FileBackedTasksManager taskManager2 = FileBackedTasksManager.loadFromFile();
         assertTrue(taskManager2.getTasks().isEmpty(), "Список задач не пустой.");
     }
 
     @Test
     void shouldReturnEmptySubtasksList() {
         int testEpicId = taskManager.createEpic(testEpic);
-        FileBackedTasksManager taskManager2 = FileBackedTasksManager.loadFromFile(taskManager.getPathInString());
+        FileBackedTasksManager taskManager2 = FileBackedTasksManager.loadFromFile();
         assertTrue(((Epic) taskManager2.getEpic(testEpicId)).getSubtaskIdList().isEmpty(), "Список подзадач эпика не пустой.");
     }
 }

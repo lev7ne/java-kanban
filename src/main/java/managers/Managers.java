@@ -9,7 +9,7 @@ public class Managers {
         return new InMemoryTaskManager();
     }
     public static HttpTaskManager getDefaultHttpTaskManager(int port) {
-        return new HttpTaskManager(port);
+        return new HttpTaskManager(port, false);
     }
     public static HistoryManager getDefaultInMemoryHistoryManager() {
         return new InMemoryHistoryManager();
@@ -18,5 +18,4 @@ public class Managers {
         GsonBuilder gsonBuilder = new GsonBuilder();
         return gsonBuilder.create();
     }
-
 }
